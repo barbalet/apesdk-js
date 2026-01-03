@@ -1,0 +1,3 @@
+[submodule "longtermbrief"]
+	path = longtermbrief
+	url = git@github.com:barbalet/longtermbrief.git
