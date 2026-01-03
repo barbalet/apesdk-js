@@ -1,0 +1,14 @@
+{
+  "name": "simape-js",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Node.js wrapper + incremental JavaScript port for simape",
+  "bin": {
+    "simape-js": "src/cli.js"
+  },
+  "scripts": {
+    "build:native": "bash build_simape_js.sh",
+    "start": "node src/cli.js",
+    "start:native": "node src/cli.js --native"
+  }
+}
