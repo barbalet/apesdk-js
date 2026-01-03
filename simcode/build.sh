@@ -42,6 +42,7 @@ fi
 
 gcc ${CFLAGS} ${COMMANDLINEE} -c ./toolkit/*.c -lz -lm -lpthread -w
 gcc ${CFLAGS} ${COMMANDLINEE} -c ./script/*.c -lz -lm -lpthread -w
+gcc ${CFLAGS} ${COMMANDLINEE} -c ./render/*.c -lz -lm -lpthread -w
 gcc ${CFLAGS} ${COMMANDLINEE} -c ./sim/*.c -lz -lm -lpthread -w
 gcc ${CFLAGS} ${COMMANDLINEE} -c ./entity/*.c -lz -lm -lpthread -w
 gcc ${CFLAGS} ${COMMANDLINEE} -c ./universe/*.c -lz -lm -lpthread -w

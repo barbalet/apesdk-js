@@ -14,15 +14,13 @@ import { XorShift32 } from "./rng.js";
  * - Output stream mirroring the original `realtime.txt` idea (simple line log)
  */
 export class SimEngineJS {
-  constructor({ seed, outputFile, renderer }) {
+  constructor({ seed, outputFile }) {
     this.seed = seed >>> 0;
     this.outputFile = outputFile ?? "realtime.txt";
     this.rng = new XorShift32(this.seed);
     this._cycle = 0;
     this._population = 0;
     this._logBuffer = [];
-    this.renderer = renderer ?? null;
-    this._renderEvery = 256; // throttle console rendering
   }
 
   init() {
@@ -33,12 +31,6 @@ export class SimEngineJS {
     // - seed random
     this._population = 128 + (this.rng.nextInt() % 128); // 128..255
     this._log(`init seed=${this.seed} population=${this._population}`);
-    if (this.renderer) {
-      this.renderer.beginFrame(this._cycle);
-      // Represent the whole group as a single entity for now.
-      this.renderer.drawEntity("group", 0, 0, { population: this._population, seed: this.seed });
-      this.renderer.endFrame();
-    }
   }
 
   tick() {
@@ -50,11 +42,6 @@ export class SimEngineJS {
     this._population = Math.max(0, this._population + drift);
 
     if ((this._cycle & 2047) === 0) this._log(`count is ${this._cycle}`);
-    if (this.renderer && (this._cycle % this._renderEvery) === 0) {
-      this.renderer.beginFrame(this._cycle);
-      this.renderer.drawEntity("group", 0, 0, { population: this._population, seed: this.seed });
-      this.renderer.endFrame();
-    }
     if (this._population === 0) {
       this._log(`new run at ${this._cycle}`);
       // reset

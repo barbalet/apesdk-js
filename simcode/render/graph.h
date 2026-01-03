@@ -35,46 +35,6 @@
 
 #include "../toolkit/toolkit.h"
 
-/*
- * Headless / command-line build:
- * The legacy C renderer (simcode/render/*.c) is optional.
- * When COMMAND_LINE_EXPLICIT is defined, provide lightweight no-op inlines
- * so core simulation code that references graph_* can compile and link
- * without requiring C render sources.
- */
-#ifdef COMMAND_LINE_EXPLICIT
-
-static inline void graph_init(n_int four_byte_factory) { (void)four_byte_factory; }
-static inline void graph_init_three(void) { }
-static inline void graph_erase(n_byte *buffer, n_vect2 *img, n_rgba32 *color)
-{ (void)buffer; (void)img; (void)color; }
-
-static inline void graph_line(n_byte *buffer,
-                              n_vect2 *img,
-                              n_vect2 *point0,
-                              n_vect2 *point1,
-                              n_rgba32 *color)
-{ (void)buffer; (void)img; (void)point0; (void)point1; (void)color; }
-
-static inline void graph_curve(n_byte *buffer,
-                               n_vect2 *img,
-                               n_vect2 *point0,
-                               n_vect2 *point1,
-                               n_vect2 *point2,
-                               n_vect2 *point3,
-                               n_rgba32 *color)
-{ (void)buffer; (void)img; (void)point0; (void)point1; (void)point2; (void)point3; (void)color; }
-
-static inline void graph_fill_polygon(n_vect2 *points,
-                                      n_int no_of_points,
-                                      n_byte *buffer,
-                                      n_vect2 *img,
-                                      n_rgba32 *color)
-{ (void)points; (void)no_of_points; (void)buffer; (void)img; (void)color; }
-
-#else
-
-
 void graph_init( n_int four_byte_factory );
 void graph_init_three(void);
 

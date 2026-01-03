@@ -4,7 +4,6 @@ import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 
 import { SimEngineJS } from "./engine_js.js";
-import { NullRenderer, ConsoleRenderer } from "./render.js";
 
 /**
  * simape-js
@@ -24,8 +23,6 @@ function parseArgs(args) {
     output: "realtime.txt",
     cycles: null,
     interactive: true,
-    render: "off", // "off" | "console"
-    renderEvery: 256,
     passThrough: []
   };
 
@@ -35,10 +32,7 @@ function parseArgs(args) {
     if (a === "--native") { out.native = true; out.engine = "native"; continue; }
     if (a === "--engine") { out.engine = (args[++i] ?? "js"); out.native = out.engine === "native"; continue; }
 
-        if (a === "--render") { out.render = String(args[++i] ?? "off"); continue; }
-    if (a === "--render-every") { out.renderEvery = Number(args[++i] ?? out.renderEvery); continue; }
-
-if (a === "--seed") { out.seed = Number(args[++i]); continue; }
+    if (a === "--seed") { out.seed = Number(args[++i]); continue; }
     if (a === "--output") { out.output = String(args[++i] ?? out.output); continue; }
     if (a === "--cycles") { out.cycles = Number(args[++i]); out.interactive = false; continue; }
     if (a === "--no-interactive") { out.interactive = false; continue; }
@@ -58,7 +52,7 @@ function printHelp() {
   console.log(`simape-js
 
 Usage:
-  simape-js [--engine js|native] [--native] [--seed N] [--output FILE] [--cycles N] [--render off|console] [--render-every N]
+  simape-js [--engine js|native] [--native] [--seed N] [--output FILE] [--cycles N]
 
 Modes:
   --engine js       Run the incremental JS port scaffold (default)
@@ -68,8 +62,6 @@ Modes:
 Options:
   --seed N          RNG seed (default: time-based)
   --output FILE     Output filename (default: realtime.txt)
-  --render MODE     Renderer: off|console (default: off)
-  --render-every N  Render every N cycles in JS engine (default: 256)
   --cycles N        Run N cycles non-interactively (JS engine only for now)
   --no-interactive  Disable interactive REPL (JS engine only)
   -h, --help        Show this help
@@ -93,18 +85,7 @@ async function runNative(passThrough) {
 }
 
 async function runJs(opts) {
-  const renderer =
-    (opts.render === "console")
-      ? new ConsoleRenderer()
-      : (opts.render === "off" ? null : new NullRenderer());
-
-  const engine = new SimEngineJS({
-    seed: opts.seed,
-    outputFile: opts.output,
-    renderer
-  });
-  if (engine.renderer) engine._renderEvery = Math.max(1, Number(opts.renderEvery) || 256);
-
+  const engine = new SimEngineJS({ seed: opts.seed, outputFile: opts.output });
 
   if (opts.cycles != null && Number.isFinite(opts.cycles)) {
     engine.init();
