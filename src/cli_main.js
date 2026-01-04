@@ -18,7 +18,7 @@ import { SimEngineJS } from "./engine_js.js";
 function parseArgs(args) {
   const out = {
     native: false,
-    engine: "js", // "js" | "native"
+    engine: "js", // "js" | "native" | "native-lib"
     seed: null,
     output: "realtime.txt",
     cycles: null,
@@ -31,6 +31,7 @@ function parseArgs(args) {
 
     if (a === "--native") { out.native = true; out.engine = "native"; continue; }
     if (a === "--engine") { out.engine = (args[++i] ?? "js"); out.native = out.engine === "native"; continue; }
+    if (a === "--native-lib") { out.engine = "native-lib"; continue; }
 
     if (a === "--seed") { out.seed = Number(args[++i]); continue; }
     if (a === "--output") { out.output = String(args[++i] ?? out.output); continue; }
@@ -54,10 +55,14 @@ function printHelp() {
 Usage:
   simape-js [--engine js|native] [--native] [--seed N] [--output FILE] [--cycles N]
 
+  simape-js --native-lib
+
 Modes:
   --engine js       Run the incremental JS port scaffold (default)
   --engine native   Run the original C simape binary via Node wrapper
+  --engine native-lib  Run the C core via a Node native addon (lib_* API)
   --native          Alias for --engine native
+  --native-lib      Alias for --engine native-lib
 
 Options:
   --seed N          RNG seed (default: time-based)
@@ -69,7 +74,46 @@ Options:
 Notes:
   - Unknown flags are forwarded to the native simape when using --engine native.
   - JS engine currently ports the CLI/control flow in clean JS idioms; simulation internals can be migrated module-by-module.
+  - native-lib requires: npm run build:native-lib
 `);
+}
+
+async function runNativeLib() {
+  // ESM-friendly require of the compiled addon.
+  const { createRequire } = await import("node:module");
+  const require = createRequire(import.meta.url);
+
+  let addon;
+  try {
+    addon = require("../dist/native/longtermbrief.node");
+  } catch (e) {
+    throw new Error(
+      "Native addon not found. Build it with: npm run build:native-lib\n" +
+      "Underlying error: " + (e?.message ?? String(e))
+    );
+  }
+
+  addon.init();
+
+  const rl = createInterface({ input: process.stdin, output: process.stdout, terminal: true });
+  const prompt = () => rl.prompt(true);
+  rl.setPrompt("> ");
+  prompt();
+
+  rl.on("line", (line) => {
+    const input = line.trimEnd();
+    addon.checkString(input + "\n");
+    if (!addon.quitCheck()) {
+      addon.close();
+      rl.close();
+      return;
+    }
+    prompt();
+  });
+
+  rl.on("close", () => {
+    try { addon.close(); } catch {}
+  });
 }
 
 async function runNative(passThrough) {
@@ -162,5 +206,10 @@ export async function runCli(args) {
     // Forward everything we didn't parse so it behaves like simape while porting.
     return runNative(opts.passThrough.length ? opts.passThrough : ["-c"]);
   }
+
+  if (opts.engine === "native-lib") {
+    return runNativeLib();
+  }
+
   return runJs(opts);
 }
