@@ -1,0 +1,51 @@
+ape not found should not quit simulation:
+
+> episodic Kira Cedar-River
+ERROR: Ape not found @ js 0
+thomas.barbalet@MacBook-Pro bin % list
+zsh: command not found: list
+
+run forever should run forever
+
+> run forever
+run: forever (press Ctrl+C or type stop/quit)
+run: (capped) advanced 365 day(s). Day=365
+> run forever
+run: forever (press Ctrl+C or type stop/quit)
+run: (capped) advanced 365 day(s). Day=730
+> sim
+Day: 730  Step: 17520  Alive: 6  Inactive: 96
+Interval (days): 1
+Logging: off  Events: on
+
+
+episodic fails
+
+> episodic Kesh Hill-River
+ERROR: Ape not found @ js 0
+thomas.barbalet@MacBook-Pro bin %
+
+apes are rarely found
+
+> watch Oria Salt-Flint all
+ERROR: Named ape not found @ js 0
+thomas.barbalet@MacBook-Pro bin %
+
+when watch works episodic needs details
+
+> watch  Asha Shell-Stone
+watch: Asha Shell-Stone
+> episodic
+Asha Shell-Stone
+day 209: a remembered encounter
+day 209: a remembered encounter
+day 238: a remembered encounter
+day 270: a remembered encounter
+day 274: a remembered encounter
+day 275: a remembered encounter
+day 277: a remembered encounter
+day 286: a remembered encounter
+day 305: a remembered encounter
+day 327: a remembered encounter
+day 337: a remembered encounter
+day 338: a remembered encounter
