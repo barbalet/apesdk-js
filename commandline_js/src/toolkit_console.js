@@ -117,7 +117,9 @@ async function console_cycle(ptr, commands, input_function, output_function) {
 
       const rv = cmd.function(ptr, response, output_function);
       if (console_line_external_exit) return 1;
-      return rv;
+      // Errors in command handlers are typically negative (e.g., SHOW_ERROR returns -1).
+      // In interactive mode we should *not* quit on those; only a positive return value quits.
+      return (rv > 0) ? rv : 0;
     }
   }
 
